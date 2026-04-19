@@ -1,6 +1,5 @@
-export function createTask(
-  override?: Partial<{ id: number; title: string; description: string }>
-) {
+import type { BoardColumn, BoardItem } from '@/features/board/types';
+export function createTask(override?: Partial<BoardItem>): BoardItem {
   return {
     id: 0,
     title: '默认任务',
@@ -9,7 +8,7 @@ export function createTask(
   };
 }
 
-export function createBoardColumn() {
+export function createBoardColumn(): BoardColumn[] {
   return [
     {
       id: -999,

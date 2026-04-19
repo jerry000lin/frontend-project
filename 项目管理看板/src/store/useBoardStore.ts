@@ -2,77 +2,65 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { createMockBoardColumn, createMockTask } from '@/mocks/factories/board';
 import { createBoardColumn } from '@/mocks/fixtures/board';
-export type BoardItem = {
-  id: number | string;
-  title: string;
-  description: string;
-};
-
-export type BoardColumn = {
-  id: number | string;
-  name: string;
-  tasks?: BoardItem[];
-};
+import type { BoardColumn, BoardItem } from '@/features/board/types';
 
 export type BoardState = {
-  boardItemList: BoardColumn[];
+  boardColumn: BoardColumn[];
   addBoardColumn: () => void;
-  addTask: (columnId: number | string) => void;
+  addTask: (columnId: number) => void;
   moveTask: (
-    taskId: number | string,
-    targetId: number | string,
-    targetType: string
+    taskId: number,
+    targetId: number,
+    targetType: 'column' | 'task'
   ) => void;
 };
 
 export const useBoardStore = create<BoardState>()(
   immer(set => ({
-    boardItemList: createBoardColumn(),
+    boardColumn: createBoardColumn(),
     addBoardColumn: () => {
       const newColumn: BoardColumn = createMockBoardColumn();
       set(state => {
-        state.boardItemList.push(newColumn);
+        state.boardColumn.push(newColumn);
       });
     },
-    addTask: (columnId: number | string) => {
+    addTask: (columnId: number) => {
       const newTask: BoardItem = createMockTask();
       set(state => {
-        const column = state.boardItemList.find(col => col.id === columnId);
+        const column = state.boardColumn.find(col => col.id === columnId);
         if (column) {
-          column.tasks = column.tasks || [];
           column.tasks.push(newTask);
         }
       });
     },
     moveTask: (
-      taskId: number | string,
-      targetId: number | string,
-      targetType: string
+      taskId: number,
+      targetId: number,
+      targetType: 'column' | 'task'
     ) => {
       set(state => {
         let task: BoardItem | undefined;
-        for (const column of state.boardItemList) {
-          const taskIndex = column.tasks?.findIndex(task => task.id === taskId);
+        if (targetType === 'task' && taskId === targetId) return;
+        for (const column of state.boardColumn) {
+          const taskIndex = column.tasks.findIndex(task => task.id === taskId);
           if (taskIndex !== undefined && taskIndex > -1) {
-            task = column.tasks!.splice(taskIndex, 1)[0];
+            task = column.tasks.splice(taskIndex, 1)[0];
           }
         }
-
+        if (!task) return;
         if (targetType === 'column') {
-          for (const column of state.boardItemList) {
+          for (const column of state.boardColumn) {
             if (column.id === targetId) {
-              column.tasks = column.tasks || [];
               column.tasks.push(task);
               break;
             }
           }
         } else if (targetType === 'task') {
-          for (const column of state.boardItemList) {
-            const taskIndex = column.tasks?.findIndex(
+          for (const column of state.boardColumn) {
+            const taskIndex = column.tasks.findIndex(
               task => task.id === targetId
             );
             if (taskIndex !== undefined && taskIndex > -1) {
-              column.tasks = column.tasks || [];
               column.tasks.splice(taskIndex, 0, task);
               break;
             }
