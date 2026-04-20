@@ -1,8 +1,10 @@
+import type {
+  BoardColumn as BoardColumnType,
+  BoardItem
+} from '@/features/board/types';
 let taskID = 0;
 let columnID = 0;
-export const createMockTask = (
-  override?: Partial<{ id: number; title: string; description: string }>
-) => {
+export const createMockTask = (override?: Partial<BoardItem>) => {
   ++taskID;
   return {
     id: taskID,
@@ -12,13 +14,7 @@ export const createMockTask = (
   };
 };
 
-export const createMockBoardColumn = (
-  override?: Partial<{
-    id: number;
-    name: string;
-    tasks: ReturnType<typeof createMockTask>[];
-  }>
-) => {
+export const createMockBoardColumn = (override?: Partial<BoardColumnType>) => {
   ++columnID;
   return {
     id: columnID,

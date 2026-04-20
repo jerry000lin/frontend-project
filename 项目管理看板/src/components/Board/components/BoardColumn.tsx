@@ -5,7 +5,7 @@ import type { BoardColumn as BoardColumnType } from '@/features/board/types';
 
 type BoardColumnProps = {
   column: BoardColumnType;
-  onAddTask: () => void;
+  onAddTask: (columnId: number) => void;
 };
 
 export const BoardColumn = (props: BoardColumnProps) => {
@@ -32,7 +32,7 @@ export const BoardColumn = (props: BoardColumnProps) => {
       <Button
         variant="outline"
         className="cursor-pointer rounded-none"
-        onClick={onAddTask}
+        onClick={() => onAddTask(column.id)}
       >
         添加任务
       </Button>

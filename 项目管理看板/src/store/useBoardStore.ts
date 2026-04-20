@@ -5,7 +5,7 @@ import { createBoardColumn } from '@/mocks/fixtures/board';
 import type { BoardColumn, BoardItem } from '@/features/board/types';
 
 export type BoardState = {
-  boardColumn: BoardColumn[];
+  boardColumns: BoardColumn[];
   addBoardColumn: () => void;
   addTask: (columnId: number) => void;
   moveTask: (
@@ -17,17 +17,17 @@ export type BoardState = {
 
 export const useBoardStore = create<BoardState>()(
   immer(set => ({
-    boardColumn: createBoardColumn(),
+    boardColumns: createBoardColumn(),
     addBoardColumn: () => {
       const newColumn: BoardColumn = createMockBoardColumn();
       set(state => {
-        state.boardColumn.push(newColumn);
+        state.boardColumns.push(newColumn);
       });
     },
     addTask: (columnId: number) => {
       const newTask: BoardItem = createMockTask();
       set(state => {
-        const column = state.boardColumn.find(col => col.id === columnId);
+        const column = state.boardColumns.find(col => col.id === columnId);
         if (column) {
           column.tasks.push(newTask);
         }
@@ -41,7 +41,7 @@ export const useBoardStore = create<BoardState>()(
       set(state => {
         let task: BoardItem | undefined;
         if (targetType === 'task' && taskId === targetId) return;
-        for (const column of state.boardColumn) {
+        for (const column of state.boardColumns) {
           const taskIndex = column.tasks.findIndex(task => task.id === taskId);
           if (taskIndex !== undefined && taskIndex > -1) {
             task = column.tasks.splice(taskIndex, 1)[0];
@@ -49,14 +49,14 @@ export const useBoardStore = create<BoardState>()(
         }
         if (!task) return;
         if (targetType === 'column') {
-          for (const column of state.boardColumn) {
+          for (const column of state.boardColumns) {
             if (column.id === targetId) {
               column.tasks.push(task);
               break;
             }
           }
         } else if (targetType === 'task') {
-          for (const column of state.boardColumn) {
+          for (const column of state.boardColumns) {
             const taskIndex = column.tasks.findIndex(
               task => task.id === targetId
             );
